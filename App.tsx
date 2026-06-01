@@ -2,47 +2,76 @@ import { Switch, Route, Router as WouterRouter } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import Landing from "./pages/landing";
-import Dashboard from "./pages/dashboard";
-import Abonnes from "./pages/abonnes";
-import AbonnesNouveau from "./pages/abonnes-nouveau";
-import Compteurs from "./pages/compteurs";
-import Releves from "./pages/releves";
-import Factures from "./pages/factures";
-import Paiements from "./pages/paiements";
-import Reclamations from "./pages/reclamations";
-import NotFound from "./pages/not-found";
+import NotFound from "@/pages/not-found";
+
+import Layout from "@/components/layout";
+import Home from "@/pages/home";
+import Dashboard from "@/pages/dashboard";
+import Clients from "@/pages/clients";
+import ClientDetail from "@/pages/clients/[id]";
+import Consommations from "@/pages/consommations";
+import Factures from "@/pages/factures";
+import Reclamations from "@/pages/reclamations";
 
 const queryClient = new QueryClient({
-  defaultOptions: { queries: { refetchOnWindowFocus: false, retry: false } },
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
 });
 
-function Router() {
+function AppRoutes() {
   return (
     <Switch>
-      <Route path="/" component={Landing} />
-      <Route path="/dashboard" component={Dashboard} />
-      <Route path="/abonnes" component={Abonnes} />
-      <Route path="/abonnes/nouveau" component={AbonnesNouveau} />
-      <Route path="/compteurs" component={Compteurs} />
-      <Route path="/releves" component={Releves} />
-      <Route path="/factures" component={Factures} />
-      <Route path="/paiements" component={Paiements} />
-      <Route path="/reclamations" component={Reclamations} />
+      <Route path="/" component={Home} />
+      <Route path="/dashboard">
+        <Layout>
+          <Dashboard />
+        </Layout>
+      </Route>
+      <Route path="/clients/:id">
+        <Layout>
+          <ClientDetail />
+        </Layout>
+      </Route>
+      <Route path="/clients">
+        <Layout>
+          <Clients />
+        </Layout>
+      </Route>
+      <Route path="/consommations">
+        <Layout>
+          <Consommations />
+        </Layout>
+      </Route>
+      <Route path="/factures">
+        <Layout>
+          <Factures />
+        </Layout>
+      </Route>
+      <Route path="/reclamations">
+        <Layout>
+          <Reclamations />
+        </Layout>
+      </Route>
       <Route component={NotFound} />
     </Switch>
   );
 }
 
-export default function App() {
+function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <WouterRouter>
-          <Router />
+        <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+          <AppRoutes />
         </WouterRouter>
         <Toaster />
       </TooltipProvider>
     </QueryClientProvider>
   );
 }
+
+export default App;
